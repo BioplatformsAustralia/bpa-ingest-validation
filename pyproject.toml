@@ -2,7 +2,7 @@
 requires = ["poetry"]
 build-backend = "poetry.masonry.api"
 
-[tool.poetry]
+[tool.poetry.packages]
 name = "bpa-ingest-validation"
 version = "0.0.4"
 authors = ["Brigette Gonch <b.gonch@qcif.edu.au>"]
