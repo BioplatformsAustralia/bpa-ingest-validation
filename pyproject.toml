@@ -1,0 +1,27 @@
+[build-system]
+requires = ["poetry"]
+build-backend = "poetry.masonry.api"
+
+[tool.poetry]
+name = "bpaingestvalidation"
+version = "0.0.1"
+authors = ["Brigette Gonch <b.gonch@qcif.edu.au>"]
+description = "Spreadsheet Validation for Bioplatforms Australia  BPA Ingest projects"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.9,<4"
+pandas = ">=1.1.1"
+unipath = "^1.1"
+xlrd = "^1.2.0"
+
+
+
+python-dateutil = "^2.8.1"
+openpyxl = "^3.0.10"
+setuptools = "^67.6.1"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.2.0"
+
+
