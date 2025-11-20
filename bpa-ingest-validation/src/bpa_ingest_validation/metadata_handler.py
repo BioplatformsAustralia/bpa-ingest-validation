@@ -1,12 +1,18 @@
 import os
-import ingest_utils
-from excel_wrapper import (
+
+
+from .excel_wrapper import (
     ExcelWrapper,
     make_field_definition as fld,
     make_skip_column as skp,
 )
 
-from util import make_logger
+from .util import make_logger
+from .bpa_ingest_utils import ( get_date_isoformat,
+extract_ands_id,
+int_or_comment,
+get_int,
+)
 import re
 """
 class BaseDatasetControlContextual:
@@ -167,7 +173,7 @@ class BaseSampleContextual:
         fld(
             "bioplatforms_sample_id",
             "bioplatforms_sample_id",
-            coerce=ingest_utils.extract_ands_id,
+            coerce=extract_ands_id,
         ),
         # sample_ID
         fld(
@@ -196,7 +202,7 @@ class BaseSampleContextual:
         fld("env_local_scale", "env_local_scale"),
         fld("env_medium", "env_medium"),
         fld("altitude", "altitude"),
-        fld("depth", "depth", coerce=ingest_utils.int_or_comment),
+        fld("depth", "depth", coerce=int_or_comment),
         fld("temperature", "temperature"),
         fld("location_info_restricted", "location_info_restricted"),
         fld("genotypic_sex", "genotypic_sex"),
@@ -204,7 +210,7 @@ class BaseSampleContextual:
         fld("method_sex_determination", "method_sex_determination", optional=True),
         fld("sex_certainty", "sex_certainty", optional=True),
         # taxon_id
-        fld("taxon_id", re.compile(r"taxon_[Ii][Dd]"), coerce=ingest_utils.get_int),
+        fld("taxon_id", re.compile(r"taxon_[Ii][Dd]"), coerce=get_int),
         # phylum
         fld("phylum", "phylum"),
         # class
@@ -227,7 +233,7 @@ class BaseSampleContextual:
         fld(
             "collection_date",
             "collection_date",
-            coerce=ingest_utils.get_date_isoformat,
+            coerce=get_date_isoformat,
         ),
         # collector
         fld("collector", "collector"),
@@ -261,9 +267,9 @@ class BaseSampleContextual:
         # life-stage
         fld("lifestage", re.compile("life[_-]stage")),
         # birth_date
-        fld("birth_date", "birth_date", coerce=ingest_utils.get_date_isoformat, optional=True),
+        fld("birth_date", "birth_date", coerce=get_date_isoformat, optional=True),
         # death_date
-        fld("death_date", "death_date", coerce=ingest_utils.get_date_isoformat, optional=True),
+        fld("death_date", "death_date", coerce=get_date_isoformat, optional=True),
         fld("health_state", "health_state"),
         # associated_media
         fld("associated_media", "associated_media"),
@@ -279,7 +285,7 @@ class BaseSampleContextual:
         fld(
             "material_extraction_date",
             re.compile(r"[Mm]aterial_extraction_date"),
-            coerce=ingest_utils.get_date_isoformat,
+            coerce=get_date_isoformat,
         ),
         # material_extracted_by
         fld("material_extracted_by", re.compile(r"[Mm]aterial_extracted_by")),
@@ -338,7 +344,7 @@ class BaseSampleContextual:
         sample_metadata[key_value] = row_meta = {}
         sample_metadata[key_value][
             "metadata_revision_date"
-        ] = ingest_utils.get_date_isoformat(self.logger, metadata_modified)
+        ] = get_date_isoformat(self.logger, metadata_modified)
         sample_metadata[key_value]["metadata_revision_filename"] = metadata_filename
         for field in row._fields:
             value = getattr(row, field)
