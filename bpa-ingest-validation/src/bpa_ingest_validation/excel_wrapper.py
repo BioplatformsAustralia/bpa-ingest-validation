@@ -195,18 +195,31 @@ class ExcelWrapper:
                     sheet = workbook.sheet_by_name(possible_sheet)
                     if sheet_name is not None:
                         # log that we are using a possibly  unexpected sheet
-                        self._logger.warn(
-                            "Using the sheet named '%s' in %s, instead of %s"
-                            % (sheet.name, file_name, sheet_name)
+                        bad_sheet_message =  "Using the sheet named '%s' in %s, instead of %s".format(
+                            sheet.name, file_name, sheet_name
                         )
-                        self._logger.warn(
-                            "Available sheets are '%s"
-                            % (
+                        available_sheet_message =  "Available sheets are '%s".format(
                                 str(
                                     workbook.sheet_names(),
                                 )
-                            )
                         )
+                        self._logger.warn(bad_sheet_message)
+                        self._log.append(bad_sheet_message)
+                        self._logger.warn(available_sheet_message)
+                        self._log.append(available_sheet_message)
+
+                        #self._logger.warn(
+                        #    "Using the sheet named '%s' in %s, instead of %s"
+                        #    % (sheet.name, file_name, sheet_name)
+                        #)
+                        #self._logger.warn(
+                        #    "Available sheets are '%s"
+                        #    % (
+                        #        str(
+                        #            workbook.sheet_names(),
+                        #        )
+                        #    )
+                        #)
 
                     break
 
