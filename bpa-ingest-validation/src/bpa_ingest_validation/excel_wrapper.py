@@ -153,12 +153,16 @@ class ExcelWrapper:
                 workbook.sheet_names(),
             )
         )
+        print("The available sheets before validation are:")
+        print(available_sheet_message)
         if sheet_name is not None:
             if isinstance(sheet_name, str):
                 if sheet_name not in workbook.sheet_names():
                     missing_sheet_message = "Missing sheet named '%s' in %s".format(
                         sheet_name, file_name
                     )
+                    print("Missing single sheet")
+                    print(missing_sheet_message)
                     self._logger.warn( missing_sheet_message)
                     self._error(missing_sheet_message)
                     self._logger.warn(available_sheet_message)
@@ -179,6 +183,12 @@ class ExcelWrapper:
                         missing_sheet_message = "Missing sheet named '%s' in %s".format(
                             candidate, file_name
                         )
+                        print ("mssing sheet - list of multiples")
+                        print(missing_sheet_message)
+                        self._logger.warn(missing_sheet_message)
+                        self._error(missing_sheet_message)
+                        self._logger.warn(available_sheet_message)
+                        self._error(available_sheet_message)
 
             else:
                 raise TypeError
@@ -193,6 +203,8 @@ class ExcelWrapper:
                         bad_sheet_message =  "Using the sheet named '%s' in %s, instead of %s".format(
                             sheet.name, file_name, sheet_name
                         )
+                        print("Bad sheet")
+                        print(bad_sheet_message)
                         self._logger.warn(bad_sheet_message)
                         self._error(bad_sheet_message)
                         self._logger.warn(available_sheet_message)
@@ -204,6 +216,8 @@ class ExcelWrapper:
         if sheet is None:
             sheet = workbook.sheet_by_index(0)
             first_sheet_message = "Using the FIRST sheet (named '%s') in %s".format(sheet.name, file_name)
+            print("using the first sheet")
+            print(first_sheet_message)
             self._logger.warn(first_sheet_message)
             self._error(first_sheet_message)
             self._logger.warn(available_sheet_message )
