@@ -148,7 +148,7 @@ class ExcelWrapper:
         ]
 
         sheet = None
-        available_sheet_message = "Available sheets are '%s".format(
+        available_sheet_message = "Available sheets are {}".format(
             str(
                 workbook.sheet_names(),
             )
@@ -158,7 +158,7 @@ class ExcelWrapper:
         if sheet_name is not None:
             if isinstance(sheet_name, str):
                 if sheet_name not in workbook.sheet_names():
-                    missing_sheet_message = "Missing sheet named '%s' in %s".format(
+                    missing_sheet_message = "Missing sheet named '{}' in {}".format(
                         sheet_name, file_name
                     )
                     print("Missing single sheet")
@@ -180,7 +180,7 @@ class ExcelWrapper:
                         break
                 if sheet is None:
                     for candidate in notfound:
-                        missing_sheet_message = "Missing sheet named '%s' in %s".format(
+                        missing_sheet_message = "Missing sheet named '{}' in {}".format(
                             candidate, file_name
                         )
                         print ("mssing sheet - list of multiples")
@@ -200,7 +200,7 @@ class ExcelWrapper:
                     sheet = workbook.sheet_by_name(possible_sheet)
                     if sheet_name is not None:
                         # log that we are using a possibly  unexpected sheet
-                        bad_sheet_message =  "Using the sheet named '%s' in %s, instead of %s".format(
+                        bad_sheet_message =  "Using the sheet named {} in {}, instead of {}".format(
                             sheet.name, file_name, sheet_name
                         )
                         print("Bad sheet")
@@ -215,7 +215,7 @@ class ExcelWrapper:
         # Last resort, we haven't found a sheet by any of the possible names, so use the first sheet
         if sheet is None:
             sheet = workbook.sheet_by_index(0)
-            first_sheet_message = "Using the FIRST sheet (named '%s') in %s".format(sheet.name, file_name)
+            first_sheet_message = "Using the FIRST sheet (named {}) in {}".format(sheet.name, file_name)
             print("using the first sheet")
             print(first_sheet_message)
             self._logger.warn(first_sheet_message)
@@ -225,7 +225,7 @@ class ExcelWrapper:
 
         if sheet.visibility > 0:
             raise Exception(
-                "Sheet named '%s' in %s is not visible.  Correct and re-run"
+                "Sheet named %s in %s is not visible.  Correct and re-run"
                 % (sheet_name, file_name)
             )
 
