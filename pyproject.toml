@@ -9,7 +9,7 @@ readme = "README.md"
 requires-python = ">=3.9"
 
 [tool.poetry]
-packages = [{include = "bpa_ingest_validation", from = "src"}]
+packages = [{include = "bpa_ingest_validation", from = "bpa-ingest-validation/src"}]
 
 
 
