@@ -160,7 +160,7 @@ class BaseDatasetControlContextual:
 """
 
 class BaseSampleContextual:
-    sheet_names = ["Sample metadata"]
+    sheet_names = ["Sample metadata", "sample_metadata"]
 
     name_mapping = {
         "decimal_longitude": "longitude",
