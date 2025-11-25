@@ -547,6 +547,7 @@ class ExcelWrapper:
                         self.sheet.name,
                         error,
                     )
+                    self._logger.warn(return_message)
                     self._error(return_message)
                 tpl.append(val)
             if self.additional_context:

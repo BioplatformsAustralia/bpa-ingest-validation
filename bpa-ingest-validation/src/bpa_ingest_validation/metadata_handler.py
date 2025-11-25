@@ -8,7 +8,7 @@ from .excel_wrapper import (
 )
 
 from .util import make_logger
-from .bpa_ingest_utils import ( get_date_isoformat,
+from .bpa_ingest_validations import ( get_date_isoformat,
 extract_ands_id,
 int_or_comment,
 get_int,
@@ -344,7 +344,7 @@ class BaseSampleContextual:
         sample_metadata[key_value] = row_meta = {}
         sample_metadata[key_value][
             "metadata_revision_date"
-        ] = get_date_isoformat(self.logger, metadata_modified)
+        ] = get_date_isoformat( metadata_modified)
         sample_metadata[key_value]["metadata_revision_filename"] = metadata_filename
         for field in row._fields:
             value = getattr(row, field)
