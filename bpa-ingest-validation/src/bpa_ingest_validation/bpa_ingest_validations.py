@@ -3,7 +3,7 @@ import datetime
 import math
 import re
 
-from .bpa_constants import BPA_PREFIX
+from bpa_constants import BPA_PREFIX
 
 ands_id_re = re.compile(r"^102\.100\.100[/\.](\d+)$")
 ands_id_abbrev_re = re.compile(r"^(\d+)$")
@@ -12,34 +12,42 @@ ands_id_abbrev_2_re = re.compile(r"^102\.100\.\.100[/\.](\d+)$")
 # <sample_id>_<extraction>
 #sample_extraction_id_re = re.compile(r"^\d{4,6}_\d")
 
+# generic validation, returning errors or None as second parameter
+# These coerce functions are used by BaseSampleMetadata - the only one converted so far
+"""
+date_or_int_or_comment,
+extract_ands_id,
+int_or_comment
+get_int
+get_date_isoformat
+"""
 
-def to_uppercase(logger, s):
-    if s is None:
-        return
-    return str(s).upper()
+#Second return value in ALL cases is the error that was reported.
+# Makes logging the responsibility of the caller.
+# If no error, return None.
 
-def extract_ands_id(logger, s, silent=False):
+def extract_ands_id(s, silent=False):
     "parse a BPA ID, with or without the prefix, returning with the prefix"
     if isinstance(s, float):
         s = int(s)
     if isinstance(s, int):
         s = str(s)
     if s is None:
-        return None
+        return None, None
     # if someone has appended extraction number, remove it
     s = s.strip()
     if s == "":
-        return None
+        return None, None
     # header row left in
     if s.startswith("e.g. "):
-        return None
+        return None, None
     # remove junk
     if s.startswith("don't use"):
-        return None
+        return None, None
     if s.startswith("missing"):
-        return None
+        return None, None
     if s.startswith("NA"):
-        return None
+        return None, None
 
     # duplicated 102.100.100: e.g. 102.100.100.102.100.100.25977
     s = s.replace("102.100.100.102.100.100.", "102.100.100/")
@@ -48,88 +56,90 @@ def extract_ands_id(logger, s, silent=False):
         s = s.rsplit("_", 1)[0]
     m = ands_id_re.match(s)
     if m:
-        return BPA_PREFIX + m.groups()[0]
+        return BPA_PREFIX + m.groups()[0], None
     m = ands_id_abbrev_re.match(s)
     if m:
-        return BPA_PREFIX + m.groups()[0]
+        return BPA_PREFIX + m.groups()[0], None
     m = ands_id_abbrev_2_re.match(s)
     if m:
-        return BPA_PREFIX + m.groups()[0]
+        return BPA_PREFIX + m.groups()[0], None
     if not silent:
-        logger.warning("unable to parse BPA ID: {}".format(str(s)))
-    return None
+        return None, "unable to parse BPA ID: {}".format(str(s))
+    return None, None
 
 
-def extract_ands_id_silent(logger, s):
-    return extract_ands_id(logger, s, silent=True)
+def extract_ands_id_silent(s):
+    return extract_ands_id(s, silent=True)
 
 
-def short_ands_id(logger, s):
-    return extract_ands_id(logger, s).split("/")[-1]
+def short_ands_id(s):
+    val, error = extract_ands_id(s)
+    return val.split("/")[-1]
 
 
-def get_int(logger, val, default=None):
+def get_int(val, default=None):
     """
     get a int from a string containing other alpha characters
     """
 
     if isinstance(val, int):
-        return val
+        return val, None
 
     try:
-        return int(get_clean_number(logger, val, default))
+        possible_int_value, error = get_clean_number(val, default)
+        return int(possible_int_value), error
     except TypeError:
-        return default
+        return default, None
 
 
-def get_percentage(logger, val, default=None):
+def get_percentage( val, default=None):
     return_val = default
     try:
-        return_val = get_clean_number(logger, val, default)
+        return_val = get_clean_number( val, default)
+        error = None
         if (return_val > 100 or return_val < 0) and return_val != -9999.0:
-            logger.warning(
-                "Potential invalid number - Percentage Range error: {}".format(str(val))
-            )
-        return return_val
+            error = "Potential invalid number - Percentage Range error: {}".format(str(val))
+        return return_val, error
     except TypeError:
-        return default
+        return default, None
 
 
-def int_or_comment(logger, val):
+def int_or_comment(val):
     # fix up '14.0' type values coming through from Excel; if not an integer,
     # it's a note or a text code, which we just pass back unaltered
     if val is None:
-        return None
+        return None, None
     try:
-        return str(int(float(val)))
+        return str(int(float(val))), None
     except ValueError:
         val = str(val).strip()
         if not val:
-            return None
-        return val
+            return None, None
+        return val, None
 
 
-def date_or_int_or_comment(logger, val):
+def date_or_int_or_comment( val):
     if isinstance(val, datetime.date):
-        return get_date_isoformat(logger, val)
-    return int_or_comment(logger, val)
+        return get_date_isoformat(val), None
+    return int_or_comment(val)
 
 
 number_find_re = re.compile(r"(-?\d+\.?\d*)")
 
 
-def get_clean_number(logger, val, default=None):
+def get_clean_number( val, default=None):
+    error = None
     if isinstance(val, float):
-        return val
+        return val, error
 
     if val is None:
-        return default
+        return default, error
 
     try:
-        return float(val)
+        return float(val), error
     except TypeError:
-        logger.error("Invalid number - Type error: {} ".format(str(val)))
-        return default
+        error = "Invalid number - Type error: {} ".format(str(val))
+        return default, error
     except ValueError:
         if val not in [
             "unknown",
@@ -138,39 +148,37 @@ def get_clean_number(logger, val, default=None):
             "",
             " ",
         ]:
-            logger.warning(
-                "Potential invalid number - Value error: {}".format(str(val))
-            )
+            error = "Potential invalid number - Value error: {}".format(str(val))
         pass
 
     matches = number_find_re.findall(str(val))
     if len(matches) == 0:
-        return default
-    return float(matches[0])
+        return default, error
+    return float(matches[0]), error
 
 
-def get_date_isoformat(logger, s, silent=False):
+def get_date_isoformat(s, silent=False):
     "try to parse the date, if we can, return the date as an ISO format string"
-    dt = _get_date(logger, s, silent)
+    dt = _get_date(s, silent)
     if dt is None:
-        return None
+        return None, None
     return dt.strftime("%Y-%m-%d")
 
 
-def get_date_isoformat_as_datetime(logger, s, silent=False):
+def get_date_isoformat_as_datetime(s, silent=False):
     "try to parse the date, if we can, return the date as an ISO format string"
-    dt = _get_date_time(logger, s, silent)
+    dt = _get_date_time( s, silent)
     if dt is None:
         return None
     return dt.strftime("%Y-%m-%dT%H:%M:%S")
     # return dt.strftime("%Y-%m-%dT%H:%M:%SZ")   -- remove the Z for now as CKAN has an issue with it.. ut it back when this is fixed
 
 
-def get_time(logger, s):
+def get_time(s):
     return str(s)
 
 
-def _get_date_time(logger, dt, silent=False):
+def _get_date_time(dt, silent=False):
     if dt is None:
         return None
 
@@ -417,15 +425,14 @@ def from_comma_or_space_separated_to_list(logger, raw):
     raise Exception("Raw input must be separated by one of {}".format(separators))
 
 
-def get_clean_doi(logger, val):
+def get_clean_doi(val):
     if not val:
-        return val
+        return val, None
 
     try:
         val.index("doi")
     except ValueError:
-        logger.error("DOI not found in: {}".format(val))
-        return None
+        return None, "DOI not found in: {}".format(val)
 
     # change any weblinks back to doi:
     regex = r"^https?:\/\/(dx\.)?doi.org\/"
@@ -438,7 +445,6 @@ def get_clean_doi(logger, val):
     # See: https://www.crossref.org/blog/dois-and-matching-regular-expressions/
 
     if not re.match(r"^doi:10.\d{4,9}\/[-._;()\/:A-Z0-9]+$", val, re.IGNORECASE):
-        logger.error("DOI does not look valid: {}".format(val))
-        return None
+        return None, "DOI does not look valid: {}".format(val)
 
-    return val
+    return val, None

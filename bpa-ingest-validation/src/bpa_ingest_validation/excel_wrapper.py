@@ -43,16 +43,24 @@ def make_skip_column(column_name, **kwargs):
 
 class ExcelWrapperLogger(logging.LoggerAdapter):
     def process(self, msg, kwargs):
-        return (
-            "Field %s, Cell %s:%s in %s, %s: %s"
-            % (
+        return_message = "Field {}, Cell {}:{} in {}, {}: {}".format(
                 self.extra["field_name"],
                 self.extra["column"],
                 self.extra["row"],
                 self.extra["filename"],
                 self.extra["sheet"],
                 msg,
-            ),
+            )
+        print("Received keyword arguments:")
+        for key, value in kwargs.items():
+            print(f"  {key}: {value}")
+
+        if 'name' in kwargs:
+            print(f"Hello, {kwargs['name']}!")
+        else:
+            print("No name provided.")
+
+        return ( return_message,
             kwargs,
         )
 
@@ -510,6 +518,7 @@ class ExcelWrapper:
         for row in self._get_rows():
             row_num = row_num + 1
             tpl = []
+            error = None
             for name in self.field_names:
                 i = self.name_to_column_map[name]
                 # i is None if the column specified was not found, in that case,
@@ -528,21 +537,17 @@ class ExcelWrapper:
                     val = val.strip()
                 # apply func
                 if func is not None:
-                    func_logger = ExcelWrapperLogger(
-                        self._logger,
-                        {
-                            "field_name": name,
-                            "row": row_num,
-                            "column": get_column_letter(i + 1),  # 0 vs 1 start
-                            "filename": os.path.basename(self.file_name),
-                            "sheet": self.sheet.name,
-                        },
+                    val, error = func(val)
+                if error:
+                    return_message = "Field {}, Cell {}:{} in {}, {}: {}".format(
+                        name,
+                        get_column_letter(i + 1),
+                        row_num,
+                        os.path.basename(self.file_name),
+                        self.sheet.name,
+                        error,
                     )
-
-                    val = func(func_logger, val)
-                    print("Error processing row")
-                    print(val)
-                self._error(val)
+                    self._error(return_message)
                 tpl.append(val)
             if self.additional_context:
                 tpl += list(self.additional_context.values())
