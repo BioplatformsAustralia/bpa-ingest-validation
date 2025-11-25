@@ -3,7 +3,7 @@ import datetime
 import math
 import re
 
-from bpa_constants import BPA_PREFIX
+from .bpa_constants import BPA_PREFIX
 
 ands_id_re = re.compile(r"^102\.100\.100[/\.](\d+)$")
 ands_id_abbrev_re = re.compile(r"^(\d+)$")
