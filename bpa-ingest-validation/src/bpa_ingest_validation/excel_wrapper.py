@@ -40,7 +40,7 @@ def make_field_definition(attribute, column_name, **kwargs):
 def make_skip_column(column_name, **kwargs):
     return skip_column_default._replace(column_name=column_name, **kwargs)
 
-
+"""
 class ExcelWrapperLogger(logging.LoggerAdapter):
     def process(self, msg, kwargs):
         return_message = "Field {}, Cell {}:{} in {}, {}: {}".format(
@@ -64,7 +64,7 @@ class ExcelWrapperLogger(logging.LoggerAdapter):
             kwargs,
         )
 
-
+"""
 class ExcelWrapper:
     """
     Parse a excel file and yields namedtuples.
@@ -422,13 +422,13 @@ class ExcelWrapper:
             if units is not None:
                 args.append("units='{}'".format(units))
             if field_name == "sample_id":
-                cleanup = "ingest_utils.extract_ands_id"
+                cleanup = "extract_ands_id"
             elif field_name in float_fields or units is not None:
-                cleanup = "ingest_utils.get_clean_number"
+                cleanup = "get_clean_number"
             elif "date" in field_name:
-                cleanup = "ingest_utils.get_date_isoformat"
+                cleanup = "get_date_isoformat"
             elif "time" in field_name:
-                cleanup = "ingest_utils.get_time"
+                cleanup = "get_time"
             if cleanup is not None:
                 args.append("coerce=" + cleanup)
             template.append("{}fld({}),".format(indent, ", ".join(args)))
@@ -518,7 +518,7 @@ class ExcelWrapper:
         for row in self._get_rows():
             row_num = row_num + 1
             tpl = []
-            error = None
+
             for name in self.field_names:
                 i = self.name_to_column_map[name]
                 # i is None if the column specified was not found, in that case,
@@ -535,6 +535,8 @@ class ExcelWrapper:
                     val = self.get_date_time(i, cell)
                 if ctype == xlrd.XL_CELL_TEXT:
                     val = val.strip()
+                # clear any previous error
+                error = None
                 # apply func
                 if func is not None:
                     val, error = func(val)
