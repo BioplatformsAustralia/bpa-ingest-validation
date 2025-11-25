@@ -313,23 +313,23 @@ class BaseSampleContextual:
 
     def _read_metadata(self, fname):
         sample_metadata = {}
-        for sheet_name in self.sheet_names:
-            wrapper = ExcelWrapper(
-                self.logger,
-                self.field_spec,
-                fname,
-                sheet_name=sheet_name,
-                header_length=1,
-                column_name_row_index=0,
-                suggest_template=True,
-            )
-            for error in wrapper.get_errors():
-                self.logger.error(error)
 
-            for row in wrapper.get_all():
-                sample_metadata = self.process_row(
-                    row, sample_metadata, os.path.basename(fname), wrapper.modified
-                )
+        wrapper = ExcelWrapper(
+            self.logger,
+            self.field_spec,
+            fname,
+            sheet_name=self.sheet_names,
+            header_length=1,
+            column_name_row_index=0,
+            suggest_template=True,
+            )
+        for error in wrapper.get_errors():
+            self.logger.error(error)
+
+        for row in wrapper.get_all():
+            sample_metadata = self.process_row(
+                row, sample_metadata, os.path.basename(fname), wrapper.modified
+            )
 
         return sample_metadata
 

@@ -153,6 +153,8 @@ class ExcelWrapper:
             "Library_Metadata",
             "Library_metadata",
             "Sheet1",
+            "Sample metadata",
+            "sample_metadata",
         ]
 
         sheet = None
