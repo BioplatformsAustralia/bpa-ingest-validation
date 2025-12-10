@@ -1,6 +1,6 @@
 [project]
 name = "bpa-ingest-validation"
-version = "0.1.15"
+version = "0.1.16"
 description = ""
 authors = [
     {name = "Brigette Gonch",email = "b.gonch@qcif.edu.au"}
