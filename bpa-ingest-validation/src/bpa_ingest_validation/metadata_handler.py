@@ -159,6 +159,8 @@ class BaseDatasetControlContextual:
         return {}
 """
 
+# This was previously name BaseLibraryContextual (but it is really SAMPLE metadata)
+#todo: change to GenericSampleContextual
 class BaseSampleContextual:
     sheet_names = ["Sample metadata", "sample_metadata"]
 

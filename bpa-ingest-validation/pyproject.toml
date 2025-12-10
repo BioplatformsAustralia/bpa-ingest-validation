@@ -1,6 +1,6 @@
 [project]
 name = "bpa-ingest-validation"
-version = "0.1.7"
+version = "0.1.8"
 description = ""
 authors = [
     {name = "Brigette Gonch",email = "b.gonch@qcif.edu.au"}
@@ -14,12 +14,12 @@ packages = [{include = "bpa_ingest_validation", from = "src"}]
 
 
 [tool.poetry.dependencies]
-pandas = "^2.3.3"
-unipath = "^1.1"
-xlrd = "^1.2.0"
-python-dateutil = "^2.9.0.post0"
-openpyxl = "^3.1.5"
-setuptools = "^80.9.0"
+pandas = ">=2.3.3"
+unipath = ">=1.1"
+xlrd = ">=1.2.0"
+python-dateutil = ">=2.9.0.post0"
+openpyxl = ">=3.1.5"
+setuptools = ">=80.9.0"
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
